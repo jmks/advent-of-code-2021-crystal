@@ -92,3 +92,18 @@ it "solves part 1" do
 
   winning_score(boards, numbers).should eq(87456)
 end
+
+describe "#last_winning_score" do
+  it "scores the example" do
+    game = example_game.split("\n", remove_empty: true)
+    numbers, boards = parse(game)
+
+    last_winning_score(boards, numbers).should eq(1924)
+  end
+end
+
+it "solves part 2" do
+  numbers, boards = parse(Input.strings(4))
+
+  last_winning_score(boards, numbers).should eq(15561)
+end

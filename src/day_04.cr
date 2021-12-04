@@ -58,6 +58,15 @@
 
 # To guarantee victory against the giant squid, figure out which board will win first. What will your final score be if you choose that board?
 
+# --- Part Two ---
+# On the other hand, it might be wise to try a different strategy: let the giant squid win.
+
+# You aren't sure how many bingo boards a giant squid could play at once, so rather than waste time counting its arms, the safe thing to do is to figure out which board will win last and choose that one. That way, no matter which boards it picks, it will win for sure.
+
+# In the above example, the second board is the last to win, which happens after 13 is eventually called and its middle column is completely marked. If you were to keep playing until this point, the second board would have a sum of unmarked numbers equal to 148 for a final score of 148 * 13 = 1924.
+
+# Figure out which board will win last. Once it wins, what would its final score be?
+
 class Board
   @rows : Array(Array(Int32))
   @cols : Array(Array(Int32))
@@ -135,4 +144,15 @@ def winning_score(boards : Array(Board), numbers : Array(Int))
   raise "No winner!" unless winner
 
   winner.score
+end
+
+def last_winning_score(boards, numbers)
+  numbers.each do |number|
+    break if boards.size == 1 && boards.first.bingo?
+
+    boards = boards.reject(&.bingo?)
+    boards.each(&.call(number))
+  end
+
+  boards.first.score
 end
