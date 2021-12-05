@@ -11,10 +11,12 @@ module Input
     lines(day)
   end
 
+  def string(day : Int)
+    File.read(Path[Dir.current].join("data", normalize_day(day)))
+  end
+
   def lines(day : Int)
-    File
-      .read(Path[Dir.current].join("data", normalize_day(day)))
-      .split("\n", remove_empty: true)
+    string(day).split("\n", remove_empty: true)
   end
 
   def normalize_day(day : Int)
