@@ -40,10 +40,37 @@
 
 # Consider only horizontal and vertical lines. At how many points do at least two lines overlap?
 
-def count_overlapping_points(input : String)
+# --- Part Two ---
+
+# Unfortunately, considering only horizontal and vertical lines doesn't give you the full picture; you need to also consider diagonal lines.
+
+# Because of the limits of the hydrothermal vent mapping system, the lines in your list will only ever be horizontal, vertical, or a diagonal line at exactly 45 degrees. In other words:
+
+# An entry like 1,1 -> 3,3 covers points 1,1, 2,2, and 3,3.
+# An entry like 9,7 -> 7,9 covers points 9,7, 8,8, and 7,9.
+
+# Considering all lines from the above example would now produce the following diagram:
+
+# 1.1....11.
+# .111...2..
+# ..2.1.111.
+# ...1.2.2..
+# .112313211
+# ...1.2....
+# ..1...1...
+# .1.....1..
+# 1.......1.
+# 222111....
+
+# You still need to determine the number of points where at least two lines overlap. In the above example, this is still anywhere in the diagram with a 2 or larger - now a total of 12 points.
+
+# Consider all of the lines. At how many points do at least two lines overlap?
+
+def count_overlapping_points(input : String, diagonal : Bool = false)
   lines = parse(input)
 
   lines
+    .select { |l| nondiagonal?(l, diagonal) }
     .map { |l| expand_line(l) }
     .flatten
     .reduce({} of Tuple(Int32, Int32) => Int32) do |freq, point|
@@ -68,19 +95,23 @@ end
 def expand_line(line : Array(Array(Int32)))
   x1, y1, x2, y2 = line.flatten
 
-  if x1 != x2 && y1 != y2
-    return [] of Array(Tuple(Int32, Int32))
+  x_diff = x2 - x1
+  y_diff = y2 - y1
+
+  x_delta = x_diff == 0 ? 0 : (x_diff / x_diff.abs).to_i
+  y_delta = y_diff == 0 ? 0 : (y_diff / y_diff.abs).to_i
+
+  steps = [x_diff.abs, y_diff.abs].max
+  points = [{x1, y1}]
+
+  steps.times do
+    x1 += x_delta
+    y1 += y_delta
+
+    points << {x1, y1}
   end
 
-  if x2 > x1
-    (x1..x2).map { |x| {x, y1} }
-  elsif x1 > x2
-    (x2..x1).map { |x| {x, y1} }
-  elsif y1 > y2
-    (y2..y1).map { |y| {x1, y} }
-  else # y2 > y1
-    (y1..y2).map { |y| {x1, y} }
-  end
+  points
 end
 
 private def parse_line(line : String)
@@ -91,4 +122,11 @@ private def parse_line(line : String)
         .split(",", remove_empty: true)
         .map(&.to_i)
     end
+end
+
+private def nondiagonal?(line : Array(Array(Int32)), include_diagonal : Bool)
+  x1, y1, x2, y2 = line.flatten
+  is_diagonal = x1 != x2 && y1 != y2
+
+  !is_diagonal || include_diagonal
 end

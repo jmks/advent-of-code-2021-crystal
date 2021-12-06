@@ -46,25 +46,40 @@ describe "#expand_line" do
       {5,9},
     ])
     expand_line([[9,7], [7,7]]).should eq([
-      {7,7},
-      {8,7},
       {9,7},
+      {8,7},
+      {7,7},
     ])
   end
 
   it "expands vertical lines" do
+    expand_line([[1,1], [3,3]]).should eq([
+      {1,1},
+      {2,2},
+      {3,3},
+    ])
     expand_line([[3,2], [3,4]]).should eq([
       {3,2},
       {3,3},
       {3,4},
     ])
   end
+
+  it "expands diagonal lines" do
+    expand_line([[1,1], [3,3]]).should eq([{1,1}, {2,2}, {3,3,}])
+    expand_line([[9,7], [7,9]]).should eq([{9,7}, {8,8}, {7,9}])
+  end
 end
 
 describe "#count_overlapping_points" do
   count_overlapping_points(example).should eq(5)
+  count_overlapping_points(example, true).should eq(12)
 end
 
 it "solves part 1" do
   count_overlapping_points(Input.string(5)).should eq(7269)
+end
+
+it "solves part 2" do
+  count_overlapping_points(Input.string(5), true).should eq(21140)
 end
