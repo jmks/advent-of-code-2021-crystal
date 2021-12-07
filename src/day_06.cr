@@ -51,34 +51,39 @@
 
 # Find a way to simulate lanternfish. How many lanternfish would there be after 80 days?
 
-class LanternFish
-  getter timer
+# --- Part Two ---
 
-  def initialize(@timer : Int32)
+# Suppose the lanternfish live forever and have unlimited food and space. Would they take over the entire ocean?
+
+# After 256 days in the example above, there would be a total of 26984457539 lanternfish!
+
+# How many lanternfish would there be after 256 days?
+
+require "big"
+
+class LanternSchool
+  @school : Array(BigInt)
+
+  def initialize(timers : Array(Int32))
+    @school = (0..8).map { |i| BigInt.new(timers.count(i)) }
   end
 
   def tick
-    @timer = spawn? ? 6 : @timer - 1
+    reset_fish  = @school.shift
+    @school[6] += reset_fish
+
+    @school << reset_fish
   end
 
-  def spawn?
-    @timer == 0
+  def size
+    @school.sum
   end
 end
 
 def total_lanternfish(timers : Array(Int32), days : Int32)
-  fish = timers.map { |t| LanternFish.new(t) }
+  school = LanternSchool.new(timers)
 
-  days.times { tick(fish) }
+  days.times { |day| school.tick }
 
-  fish.size
-end
-
-def tick(fish : Array(LanternFish))
-  total_new = fish.count(&.spawn?)
-  new_fish = (1..total_new).map { |_| LanternFish.new(8) }
-
-  fish.each(&.tick)
-
-  fish.concat(new_fish)
+  school.size
 end
