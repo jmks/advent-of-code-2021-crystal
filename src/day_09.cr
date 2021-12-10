@@ -22,6 +22,49 @@
 
 # Find all of the low points on your heightmap. What is the sum of the risk levels of all low points on your heightmap?
 
+# --- Part Two ---
+
+# Next, you need to find the largest basins so you know what areas are most important to avoid.
+
+# A basin is all locations that eventually flow downward to a single low point. Therefore, every low point has a basin, although some basins are very small. Locations of height 9 do not count as being in any basin, and all other locations will always be part of exactly one basin.
+
+# The size of a basin is the number of locations within the basin, including the low point. The example above has four basins.
+
+# The top-left basin, size 3:
+
+# 2199943210
+# 3987894921
+# 9856789892
+# 8767896789
+# 9899965678
+# The top-right basin, size 9:
+
+# 2199943210
+# 3987894921
+# 9856789892
+# 8767896789
+# 9899965678
+# The middle basin, size 14:
+
+# 2199943210
+# 3987894921
+# 9856789892
+# 8767896789
+# 9899965678
+# The bottom-right basin, size 9:
+
+# 2199943210
+# 3987894921
+# 9856789892
+# 8767896789
+# 9899965678
+
+# Find the three largest basins and multiply their sizes together. In the above example, this is 9 * 14 * 9 = 1134.
+
+# What do you get if you multiply together the sizes of the three largest basins?
+
+
+
 alias Coordinate = Tuple(Int32, Int32)
 alias Height = Int32
 
@@ -31,6 +74,16 @@ def sum_of_risk_levels(input : String)
     .low_points
     .map { |h| risk_level(h) }
     .sum
+end
+
+def product_of_largest_basins(input : String)
+  HeightMap
+    .parse(input)
+    .basins
+    .map { |basin| basin.size }
+    .sort { |a, b| b <=> a }
+    .first(3)
+    .product
 end
 
 def risk_level(height : Height)
@@ -45,7 +98,7 @@ class HeightMap
 
     lines = input.split("\n", remove_empty: true)
     lines.each_with_index do |line, row|
-      heights = line.chars.map(&.to_i)
+      heights = line.gsub(" ", "").chars.map(&.to_i)
 
       heights.each_with_index do |height, col|
         map.height({col, row}, height)
@@ -59,17 +112,38 @@ class HeightMap
     @map = {} of Coordinate => Height
   end
 
+  def each
+    @map.keys.sort
+  end
+
   def height(c : Coordinate, h : Height)
     @map[c] = h
   end
 
   def low_points
-    @map
-      .keys
-      .select do |c|
-        adjacent(c).all? { |a| @map[a] > @map[c] }
+    low_coordinates.map { |c| @map[c] }
+  end
+
+  def basins
+    low_coordinates.map do |low_point|
+      basin_coordinates = Set(Coordinate).new
+
+      points_to_explore = [low_point]
+      while points_to_explore.any?
+        point = points_to_explore.pop
+
+        basin_coordinates << point
+
+        adjacent_basin_points =
+          adjacent(point)
+            .select { |c| @map[c] != 9 }
+            .select { |c| !basin_coordinates.includes?(c) }
+
+        points_to_explore.concat(adjacent_basin_points)
       end
-      .map { |c| @map[c] }
+
+      basin_coordinates.map { |c| @map[c] }
+    end
   end
 
   private def adjacent(c : Coordinate)
@@ -81,5 +155,13 @@ class HeightMap
       {col, row + 1},
       {col, row -1}
     ].select { |c| @map.has_key?(c) }
+  end
+
+  private def low_coordinates
+    @map
+      .keys
+      .select do |c|
+      adjacent(c).all? { |a| @map[a] > @map[c] }
+    end
   end
 end
