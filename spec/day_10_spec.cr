@@ -51,3 +51,13 @@ describe "#syntax_error_score" do
     syntax_error_score(Input.string(10)).should eq(339_477)
   end
 end
+
+describe "#incomplete_score" do
+  it "scores the subsystem" do
+    incomplete_score(example_subsystem).should eq(288_957)
+  end
+
+  it "solves part 2" do
+    incomplete_score(Input.string(10)).should eq(1337)
+  end
+end
