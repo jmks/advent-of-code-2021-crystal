@@ -294,6 +294,49 @@
 
 # Given the starting energy levels of the dumbo octopuses in your cavern, simulate 100 steps. How many total flashes are there after 100 steps?
 
+# --- Part Two ---
+
+# It seems like the individual flashes aren't bright enough to navigate. However, you might have a better option: the flashes seem to be synchronizing!
+
+# In the example above, the first time all octopuses flash simultaneously is step 195:
+
+# After step 193:
+# 5877777777
+# 8877777777
+# 7777777777
+# 7777777777
+# 7777777777
+# 7777777777
+# 7777777777
+# 7777777777
+# 7777777777
+# 7777777777
+
+# After step 194:
+# 6988888888
+# 9988888888
+# 8888888888
+# 8888888888
+# 8888888888
+# 8888888888
+# 8888888888
+# 8888888888
+# 8888888888
+# 8888888888
+
+# After step 195:
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# If you can calculate the exact moments when the octopuses will all flash simultaneously, you should be able to navigate through the cavern. What is the first step during which all octopuses flash?
+
 alias Coordinate = Tuple(Int32, Int32)
 
 class Grid
@@ -343,6 +386,10 @@ class Grid
     @total_flashes += new_flashes.size
   end
 
+  def size
+    @grid.size
+  end
+
   private def increment
     @grid.each_key { |c| @grid[c] += 1 }
   end
@@ -377,4 +424,20 @@ def total_flashes(input : String, steps : Int32)
   steps.times { grid.step }
 
   grid.total_flashes
+end
+
+def steps_to_synchronize(input : String)
+  grid = Grid.parse(input)
+  steps = 0
+
+  loop do
+    steps += 1
+
+    previously = grid.total_flashes
+    grid.step
+
+    break if grid.total_flashes - previously == grid.size
+  end
+
+  steps
 end
