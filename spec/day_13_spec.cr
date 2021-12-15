@@ -92,3 +92,8 @@ describe "#dots_visible" do
     dots_visible(Input.string(13), 1).should eq(759)
   end
 end
+
+it "solves part 2" do
+  puts ""
+  puts fold(Input.string(13), 12).to_s
+end

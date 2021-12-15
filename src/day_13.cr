@@ -105,26 +105,31 @@
 
 # How many dots are visible after completing just the first fold instruction on your transparent paper?
 
+# --- Part Two ---
+
+# Finish folding the transparent paper according to the instructions. The manual says the code is always eight capital letters.
+
+# What code do you use to activate the infrared thermal imaging camera system?
+
 alias Coordinate = Tuple(Int32, Int32)
 
-def dots_visible(instructions : String, folds : Int32)
+def fold(instructions : String, folds : Int32)
   dots, instructions = parse(instructions)
 
   instructions
     .first(folds)
     .reduce(Sheet.new(dots)) { |sheet, fold| sheet.fold(fold) }
+end
+
+def dots_visible(instructions : String, folds : Int32)
+  fold(instructions, folds)
     .total_dots
 end
 
 class Sheet
   getter dots
 
-  @width : Int32
-  @height : Int32
-
   def initialize(@dots : Array(Coordinate))
-    @width = @dots.max_by { |x, y| x }.first
-    @height = @dots.max_by { |x, y| y }.last
   end
 
   def fold(instruction : Tuple(Symbol, Int32))
@@ -150,9 +155,11 @@ class Sheet
 
   def to_s
     points = @dots.map { |c| {c, true} }.to_h
+    width = @dots.max_by { |x, y| x }.first
+    height = @dots.max_by { |x, y| y }.last
 
-    (0..@height).map do |y|
-      (0..@width).map { |x| points[{x, y}]? ? "#" : "." }.join("")
+    (0..height).map do |y|
+      (0..width).map { |x| points[{x, y}]? ? "#" : "." }.join("")
     end.join("\n")
   end
 
