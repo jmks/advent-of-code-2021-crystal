@@ -18,11 +18,27 @@ class Grid
     new(map)
   end
 
+  def self.parse(input : Array(Array(Int32)))
+    map = Hash(Coordinate, Int32).new
+
+    input.each_with_index do |ints, row|
+      ints.each_with_index do |int, col|
+        map[{col, row}] = int
+      end
+    end
+
+    new(map)
+  end
+
   def initialize(@grid : Hash(Coordinate, Int32))
   end
 
   def at(c : Coordinate)
     @grid[c]
+  end
+
+  def size
+    @grid.size
   end
 
   def adjacent(c : Coordinate, positions = [:horizontal, :vertical, :diagonal])

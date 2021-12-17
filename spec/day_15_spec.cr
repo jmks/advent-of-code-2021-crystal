@@ -40,7 +40,19 @@ describe "#lowest_risk" do
     best_first_search(Grid.parse(example), {0, 0}, {9, 9}).should eq(40)
   end
 
-  it "solves the problem" do
+  it "solves the part 1" do
     best_first_search(Grid.parse(Input.string(15)), {0, 0}, {99, 99}).should eq(602)
+  end
+
+  it "solves part 2" do
+    grid = Grid.parse(expand_grid(Input.string(15)))
+
+    best_first_search(grid, {0, 0}, {499, 499}).should eq(602)
+  end
+end
+
+describe "#expand_grid" do
+  it "expands the grid by 5 times" do
+    expand_grid(example).flatten.size.should eq(2500)
   end
 end
